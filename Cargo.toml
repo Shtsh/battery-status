@@ -1,6 +1,6 @@
 [package]
 name = "battery-status"
-version = "0.1.0"
+version = "0.1.1"
 edition = "2021"
 
 [dependencies]
@@ -12,7 +12,7 @@ futures = "0.3.30"
 lazy_static = "1.5.0"
 serialport = "4.4.0"
 simplelog = { version = "0.12.2", features = ["paris"] }
-tokio = { version = "1.38.0", features = ["full"] }
+tokio = { version = "1.38.0", features = ["io-std", "io-util", "macros", "rt", "rt-multi-thread"] }
 uuid = "1.9.1"
 
 [target.'cfg(target_os="macos")'.dependencies]
