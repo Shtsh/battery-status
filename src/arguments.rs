@@ -20,4 +20,12 @@ pub struct Cli {
         help = "Read information about BLE devices"
     )]
     pub bluetooth_support: bool,
+    #[arg(
+        short,
+        long,
+        name = "json",
+        help = "Format output as json"
+    )]
+    pub json: bool,
+
 }

@@ -1,8 +1,9 @@
 mod arguments;
 mod bluetooth;
 mod dygma;
-mod formatter;
 mod permissions;
+mod report;
+pub(crate) mod status;
 
 use anyhow::{Error, Result};
 use clap::Parser;
@@ -21,11 +22,15 @@ async fn main() -> Result<(), Error> {
     .unwrap();
     debug!("Checking permissions");
     permissions::check_permissions()?;
+
+    let mut reports = Vec::<report::Report>::new();
+
     if cli.bluetooth_support {
         info!("Bluetooth devices are enabled");
         let adapter = bluetooth::get_adapter().await?;
-        let status = bluetooth::process_adapter(adapter).await?;
-        formatter::print_bt_battery_levels(status).await?;
+        for info in bluetooth::process_adapter(adapter).await? {
+            reports.push(report::Report::from(info));
+        }
     }
 
     if cli.dygma_support {
@@ -38,8 +43,10 @@ async fn main() -> Result<(), Error> {
         }
         for device in devices {
             let status = dygma::get_battery_info(device.port_name)?;
-            formatter::print_dygma_battery_levels(status).await?;
+            reports.push(report::Report::from(status));
         }
     }
+
+    report::print_reports(reports, &cli.json).await?;
     Ok(())
 }

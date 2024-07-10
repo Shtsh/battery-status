@@ -5,6 +5,7 @@ use lazy_static::lazy_static;
 use serialport;
 use simplelog::*;
 
+use crate::status::BatteryStatus;
 const VENDOR_ID: u16 = 13807; // Dygma
 
 lazy_static! {
@@ -13,17 +14,13 @@ lazy_static! {
     ];
 }
 
-pub enum BatteryStatus {
-    Charging,
-    Charged,
-    Discharging,
-}
-
 impl FromStr for BatteryStatus {
     type Err = Error;
 
     fn from_str(s: &str) -> std::result::Result<Self, Self::Err> {
         match s {
+            "4" => Ok(BatteryStatus::Unknown),
+            "3" => Ok(BatteryStatus::Unknown),
             "2" => Ok(BatteryStatus::Charged),
             "1" => Ok(BatteryStatus::Charging),
             "0" => Ok(BatteryStatus::Discharging),
@@ -35,7 +32,8 @@ impl FromStr for BatteryStatus {
     }
 }
 
-pub struct DygmaBatteryInfo {
+#[allow(dead_code)]
+pub(crate) struct DygmaBatteryInfo {
     pub name: String,
     pub left_level: u8,
     pub left_status: BatteryStatus,
